@@ -65,3 +65,22 @@ def findmoviesGenre(genre, lst):
         if genre.lower() in movie['genres'].lower():
             info_movies.append(movie)
     return info_movies
+
+def findmovieId(Id, lst):
+    """
+    Retorna:
+        -El diccionario de la pelicula que tiene ese ID.
+    """
+    iterator=it.newIterator(lst)
+    found=False
+    dic=None
+    while it.hasNext(iterator) and not found:
+        movie=it.next(iterator)
+        if movie['id'] == Id:
+            found=True
+            dic=movie
+    if found == True:
+        return movie
+    else:
+        return ('No movie match with ID')
+                 

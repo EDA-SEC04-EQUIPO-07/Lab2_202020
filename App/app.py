@@ -26,6 +26,8 @@
   Este módulo es una aplicación básica con un menú de opciones para cargar datos, contar elementos, y hacer búsquedas sobre una lista .
 """
 
+#imports
+
 import config as cf
 import sys
 import csv
@@ -38,7 +40,7 @@ from Sorting import insertionsort
 
 #Funciones programa
 
-def loadCSVFile (file, lst,Type='SINGLE_LINKED',sep=";"):
+def loadCSVFile (file, lst,Type='ARRAY_LIST',sep=';'):
     """
     Carga un archivo csv a una lista
     Args:
@@ -70,17 +72,19 @@ def loadCSVFile (file, lst,Type='SINGLE_LINKED',sep=";"):
 
 def countElementsFilteredByColumn(criteria, column, lst):
     """
-    Retorna cuantos elementos coinciden con un criterio para una columna dada  
+    Retorna cuantos elementos coinciden con un criterio para una columna dada.
+
     Args:
-        criteria:: str
-            Critero sobre el cual se va a contar la cantidad de apariciones
-        column
-            Columna del arreglo sobre la cual se debe realizar el conteo
-        list
-            Lista en la cual se realizará el conteo, debe estar inicializada
+        criteria :: str
+            Critero sobre el cual se va a contar la cantidad de apariciones.
+        column:
+            Columna del arreglo sobre la cual se debe realizar el conteo.
+        list:
+            Lista en la cual se realizará el conteo, debe estar inicializada.
+
     Return:
         counter :: int
-            la cantidad de veces ue aparece un elemento con el criterio definido
+            la cantidad de veces ue aparece un elemento con el criterio definido.
     """
     if lst['size']==0:
         print("La lista esta vacía")  
@@ -99,7 +103,18 @@ def countElementsFilteredByColumn(criteria, column, lst):
 
 def countElementsByCriteria(criteria, column, lst):
     """
-    Retorna la cantidad de elementos que cumplen con un criterio para una columna dada
+    Cuenta cuantos elementos cumplen con la condicion dada por una columna.
+
+    Arg:
+        criteria:
+            -El criterio de busqueda.
+        columm :: str
+            -La columna en la cual se hace la comparacion.
+        lst :: list
+            -Informacion de las peliculas.
+    
+    Retorna :: int
+        -La cantidad de elementos que cumplen con un criterio para una columna dada.
     """
     iterator=it.newIterator(lst)
     meter=0
@@ -117,63 +132,79 @@ def orderElementsByCriteria(function, column, lst, elements):
 
 def SearchbyDirector(lst,lst2,name_director):
     """
-    retorna: La lista de todas las películas dirigidas, El numero de las películas y El promedio de la calificación de sus películas.
+    Busca todas las peliculas en las que un director trabajo.
+
+    Arg:
+        -lst :: list 
+            La informacion en bruto de las peliculas.
+        -lst2 :: list 
+            La informacion especifica de las peliculas.
+        -name_director :: str
+            El nombre del director.
+    
+    Retorna :: tuple 
+        -Todas las películas dirigidas, El numero de las películas 
+        y El promedio de la calificación de sus películas.
     """
     avgsum= 0
     info_movies=sup.findmoviesDirector(name_director, lst)
     size=len(info_movies)
     list_movies=[]
-    iterator2=it.newIterator(lst2)
-    while it.newIterator(iterator2):
-        movie=it.next(iterator2)
-        i=0
-        found=False
-        while i < size and not found:
-            if movie['id'] == info_movies[i]['id']:
-                list_movies.append(movie['title'])
-                avgsum+= movie["vote_average"]
-                found=True
-            i+=1
+    for movie in info_movies:
+        movie_data=sup.findmovieId(movie['id'], lst2)
+        list_movies.append(movie_data['title'])
+        avgsum+=movie_data['vote_average']
     avg=avgsum/size
     return(list_movies,size,avg)
 
-def SearchbyActor(lst,lst2,name_actor):
+def SearchbyActor(lst,lst2,actor_name):
     """
-    retorna: La lista de todas las películas dirigidas, El numero de las películas y El promedio de la calificación de sus películas.
+    Busca todas las peliculas en las que un actor participo.
+
+    Arg:
+        -lst :: list 
+            -La informacion en bruto de las pelicula.
+        -lst2 :: list
+            -La informacion especifica de las peliculas.
+        -actor_name :: str 
+            -Nombre del actor buscado
+    retorna :: tuple 
+        -Todas las películas en las que actuo, el numero de las películas, 
+        el promedio de calificacion y el director con el que mas trabajo en ese orden.
     """
     avgsum= 0
-    info_peliculas=[]
-    lista_peliculas=[]
-    dict_directores={}
-    iterador= it.newIterator(lst)
-    while it.hasNext(iterador):
-        movie= it.next(iterador)
-        if movie['actor1_name'].lower() or movie['actor2_name'].lower() or movie['actor3_name'].lower() or movie['actor4_name'].lower() or movie['actor5_name'].lower() == name_director.lower():
-            info_peliculas.append
-            name_director= movie["director_name"]
-            if name_director in dict_directores.keys():
-                dict_directores[name_director]+=1
-            else:
-                dict_directores[name_director]=1
-
-    iterador2=it.newIterator(lst2)
-    while it.newIterator(iterador2):
-        movie=it.next(iterador2)
-        i=0
-        found= False
-        while i < len(lista_peliculas) and not found:
-            if movie['id'] == info_peliculas[i]['id']:
-                lista_peliculas.append(movie['title'])
-                avgsum+= movie["vote_average"]
-            i+=1
-    director= max(dict_directores)
-    avg=avgsum/len(info_peliculas)
-    return(lista_peliculas,len(info_peliculas),avg,director)
+    info_movies=sup.findmoviesActor(actor_name, lst)
+    size=len(info_movies)
+    list_movies=[]
+    dict_directors={}
+    for movie in info_movies:
+        name_director=movie['director_name']
+        movie_data=sup.findmovieId(movie['id'], lst2)
+        list_movies.append(movie_data['title'])
+        avgsum+=movie_data['vote_average']
+        if name_director in dict_directors.keys():
+            dict_directors[name_director]+=1
+        else:
+            dict_directors[name_director]=1
+    director= max(dict_directors)
+    avg=avgsum/size
+    return(list_movies,size,avg,director)
 
 def meetGenre(lst, lst2, genre):
     """
-    Retorna:
-        -lista con la informacion de las peliculas, el numero de peliculas y la votacion promedio. 
+    Busca todas las peliculas que corresponden al genero dado por parametro.
+
+    Arg:
+        lst :: list
+            -La informacion en bruto de las peliculas.
+        lst2 :: list
+            -La informacion especifica de las peliculas.
+        genre :: str
+            -El genero que se desea buscar.
+
+    Retorna :: tuple
+        -El titulo de las peliculas, el numero de peliculas y la votacion promedio en ese orden.
+
     """
     avgsum=0
     info_movies=sup.findmoviesGenre(genre, lst2)
@@ -190,6 +221,10 @@ def meetGenre(lst, lst2, genre):
 def printMenu():
     """
     Imprime el menu de opciones
+
+    Arg :: None
+
+    Return :: None
     """
     print("\nBienvenido")
     print("1- Cargar Datos")
@@ -198,13 +233,16 @@ def printMenu():
     print("4- Consultar elementos a partir de dos listas")
     print("0- Salir")
 
+#menu
+
 def main():
     """
-    Método principal del programa, se encarga de manejar todos los metodos adicionales creados
+    Método principal del programa, se encarga de manejar todos los metodos adicionales creados.
+    Instancia dos listas vacia en la cual se guardarán los datos cargados desde el archivo.
 
-    Instancia una lista vacia en la cual se guardarán los datos cargados desde el archivo
-    Args: None
-    Return: None 
+    Args :: None
+
+    Return :: None
     """
     lista = lt.newList('ARRAYLIST')   # se require usar lista definida
     lista2 = lt.newList('ARRAYLIST')
@@ -240,7 +278,10 @@ def main():
                 else:
                     criteria =input('Ingrese el criterio de búsqueda\n')
                     counter=countElementsByCriteria(criteria,0,lista)
-                    print("Coinciden ",counter," elementos con el crtierio: '", criteria ,"' (en construcción ...)")
+                    if counter == 0:
+                        print('Ningun elemento coincide con el criterio: \"',criteria,'\"')
+                    elif counter == 1:
+                    print('Coinciden \"',counter,'\" elementos con el crtierio: \"', criteria ,'\"')
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
                 
