@@ -114,6 +114,31 @@ def orderElementsByCriteria(function, column, lst, elements):
     Retorna una lista con cierta cantidad de elementos ordenados por el criterio
     """
     return 0
+def FindGoodMovie(lst,lst2,name_director):
+    "Retorna: el numero de películas buenas de un director y su promedio de la votación."
+    list_movies=[]
+    info_movies=[]
+    avgsum=0
+    iterador= it.newIterator(lst)
+    while it.hasNext(iterador):
+        movie= it.next(iterador)
+        if movie["director_name"].lower() == name_director.lower():
+            info_movies.append(movie)
+
+    iterador2=it.newIterator(lst2)
+    while it.newIterator(iterador2):
+        movie=it.next(iterador2)
+        i=0
+        found= False
+        while i < len(info_movies) and not found:
+            if movie['id'] == info_movies[i]['id']:
+                if movie["vote_average"] >= 6:
+                    list_movies.append(movie['title'])
+                    avgsum+= movie["vote_average"]
+            i+=1
+    avg=avgsum/len(list_movies)
+    return(len(list_movies),avg)
+
 
 def SearchbyDirector(lst,lst2,name_director):
     """
@@ -137,6 +162,7 @@ def SearchbyDirector(lst,lst2,name_director):
     avg=avgsum/size
     return(list_movies,size,avg)
 
+
 def SearchbyActor(lst,lst2,name_actor):
     """
     retorna: La lista de todas las películas en que participó. El numero de las películas. El promedio de la calificación de sus películas. El nombre del director con mas colaboraciones.
@@ -148,8 +174,8 @@ def SearchbyActor(lst,lst2,name_actor):
     iterador= it.newIterator(lst)
     while it.hasNext(iterador):
         movie= it.next(iterador)
-        if movie['actor1_name'].lower() or movie['actor2_name'].lower() or movie['actor3_name'].lower() or movie['actor4_name'].lower() or movie['actor5_name'].lower() == name_director.lower():
-            info_peliculas.append
+        if movie['actor1_name'].lower() or movie['actor2_name'].lower() or movie['actor3_name'].lower() or movie['actor4_name'].lower() or movie['actor5_name'].lower() == name_actor.lower():
+            info_peliculas.append(movie)
             name_director= movie["director_name"]
             if name_director in dict_directores.keys():
                 dict_directores[name_director]+=1
@@ -161,14 +187,14 @@ def SearchbyActor(lst,lst2,name_actor):
         movie=it.next(iterador2)
         i=0
         found= False
-        while i < len(lista_peliculas) and not found:
+        while i < len(info_peliculas) and not found:
             if movie['id'] == info_peliculas[i]['id']:
                 lista_peliculas.append(movie['title'])
                 avgsum+= movie["vote_average"]
             i+=1
     director= max(dict_directores)
-    avg=avgsum/len(info_peliculas)
-    return(lista_peliculas,len(info_peliculas),avg,director)
+    avg=avgsum/len(lista_peliculas)
+    return(lista_peliculas,len(lista_peliculas),avg,director)
 
 def meetGenre(lst, lst2, genre):
     """
